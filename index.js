@@ -154,6 +154,7 @@ client.on("message", message => {
     return message.channel.send(returnStr);
   }
 
+  /*
   if(command ==="dev-end") {
 		if(channel != message.channel)
 			return message.channel.send("`./end` must be run from the same channel that `./start` was called from.");
@@ -166,6 +167,8 @@ client.on("message", message => {
     
     return message.channel.send(returnStr);
   }
+  
+  */
 });
 
 // log the bot in
