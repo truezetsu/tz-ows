@@ -70,105 +70,105 @@ client.on("message", message => {
 
       returnStr += message.content + " ";
     } else return;
-  }
+  } else {
+	  const args = message.content
+		.slice(prefix.length)
+		.trim()
+		.split(/ +/g);
+	  const command = args.shift().toLowerCase();
 
-  const args = message.content
-    .slice(prefix.length)
-    .trim()
-    .split(/ +/g);
-  const command = args.shift().toLowerCase();
+	  if (command === "start") {
+		if (listening === true && channel === message.channel)
+		  return message.channel.send(
+			"Already listening on this channel! I'll make sure this word isn't logged. :wink:"
+		  );
+		else if (listening === true && channel != message.channel)
+		  return message.channel.send("Already listening on another channel!");
 
-  if (command === "start") {
-    if (listening === true && channel === message.channel)
-      return message.channel.send(
-        "Already listening on this channel! I'll make sure this word isn't logged. :wink:"
-      );
-    else if (listening === true && channel != message.channel)
-      return message.channel.send("Already listening on another channel!");
+		listening = true;
+		channel = message.channel;
+		returnStr = "";
+		return message.channel.send(
+		  "Now listening! Type command `./end` to stop listening or command `./undo` to undo the last word added.\nRemember to end your sentences, close your quotes, write only one word at a time, and have fun!"
+		);
+	  }
 
-    listening = true;
-    channel = message.channel;
-    returnStr = "";
-    return message.channel.send(
-      "Now listening! Type command `./end` to stop listening or command `./undo` to undo the last word added.\nRemember to end your sentences, close your quotes, write only one word at a time, and have fun!"
-    );
-  }
+	  if (command === "undo") {
+		if (channel != message.channel)
+		  return message.channel.send(
+			"`./undo` must be run from the same channel that `./start` was called from."
+		  );
 
-  if (command === "undo") {
-    if (channel != message.channel)
-      return message.channel.send(
-        "`./undo` must be run from the same channel that `./start` was called from."
-      );
-
-    if (returnStr == "")
-      return message.channel.send("I can't undo what you haven't written yet.");
-
-    const lastIndex = returnStr.lastIndexOf(" ", returnStr.length - 2);
-    returnStr = returnStr.substring(0, lastIndex) + " ";
-    return message.channel.send(
-      "Last word undone! Please continue writing your masterpiece."
-    );
-  }
-
-  if (command === "end" || command === "send_tweet" || command === "stop") {
-    if (channel != message.channel)
-      return message.channel.send(
-        "`./end` must be run from the same channel that `./start` was called from."
-      );
-
-    if (returnStr == "")
-      return message.channel.send(
-        "You didn't write anything... But I'll keep listening!"
-      );
-
-    listening = false;
-    channel = null;
-
-    if (returnStr.length <= 280) {
-      T.post("statuses/update", { status: returnStr }, function(
-        err,
-        data,
-        response
-      ) {
-        if (err && err.code != 187) throw err;
-      });
-
-      setTimeout(function() {
-        T.get(
-          "statuses/user_timeline",
-          { screen_name: "TrueZetsubou" },
-          function(err, data, response) {
-            if (err) throw err;
-
-            message.channel.send(
-              "https://twitter.com/TrueZetsubou/status/" + data[0].id_str
-            );
-          }
-        );
-      }, 3000);
-    } else
-      message.channel.send(
-        "Sorry, this one was too long for Twitter... But here's your final story:"
-      );
-
-    return message.channel.send(returnStr);
-  }
-
-  /*
-  if(command ==="dev-end") {
-		if(channel != message.channel)
-			return message.channel.send("`./end` must be run from the same channel that `./start` was called from.");
-		
 		if (returnStr == "")
-			return message.channel.send("You didn't write anything... But I'll keep listening!");
-		
+		  return message.channel.send("I can't undo what you haven't written yet.");
+
+		const lastIndex = returnStr.lastIndexOf(" ", returnStr.length - 2);
+		returnStr = returnStr.substring(0, lastIndex) + " ";
+		return message.channel.send(
+		  "Last word undone! Please continue writing your masterpiece."
+		);
+	  }
+
+	  if (command === "end" || command === "send_tweet" || command === "stop") {
+		if (channel != message.channel)
+		  return message.channel.send(
+			"`./end` must be run from the same channel that `./start` was called from."
+		  );
+
+		if (returnStr == "")
+		  return message.channel.send(
+			"You didn't write anything... But I'll keep listening!"
+		  );
+
 		listening = false;
 		channel = null;
-    
-    return message.channel.send(returnStr);
+
+		if (returnStr.length <= 280) {
+		  T.post("statuses/update", { status: returnStr }, function(
+			err,
+			data,
+			response
+		  ) {
+			if (err && err.code != 187) throw err;
+		  });
+
+		  setTimeout(function() {
+			T.get(
+			  "statuses/user_timeline",
+			  { screen_name: "TrueZetsubou" },
+			  function(err, data, response) {
+				if (err) throw err;
+
+				message.channel.send(
+				  "https://twitter.com/TrueZetsubou/status/" + data[0].id_str
+				);
+			  }
+			);
+		  }, 3000);
+		} else
+		  message.channel.send(
+			"Sorry, this one was too long for Twitter... But here's your final story:"
+		  );
+
+		return message.channel.send(returnStr);
+	  }
+
+	  /*
+	  if(command ==="dev-end") {
+			if(channel != message.channel)
+				return message.channel.send("`./end` must be run from the same channel that `./start` was called from.");
+			
+			if (returnStr == "")
+				return message.channel.send("You didn't write anything... But I'll keep listening!");
+			
+			listening = false;
+			channel = null;
+		
+		return message.channel.send(returnStr);
+	  }
+	  
+	  */
   }
-  
-  */
 });
 
 // log the bot in
